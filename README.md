@@ -3,7 +3,7 @@ Reload Nginx when upstream server IP changes
 
 ```
 Usage:
-./capione_reloader.py -d -s true -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf
+./capione_reloader.py -d -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf
 
   -d : --debug logging
   -s : --stdout console logging
