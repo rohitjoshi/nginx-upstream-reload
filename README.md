@@ -3,6 +3,8 @@ Reload Nginx when upstream server IP changes.
 
 Every minute, tt will reload upstream.conf file and resolve host and compare aginst the previous results. If DNS server returned different results (IP address), it will reload nginx
 
+NOTE: you might have to install `dnspython` module using `pip install dnspython`
+
 ```
 Usage:
 ./nginx_reloader.py -d -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf
