@@ -14,4 +14,25 @@ Usage:
   -l : --log_file  default=nginx_reloader.log
   -d : --debug logging
   -s : --stdout console logging
+  
+```
+
+It is expecting upstream.conf file in the following format.
+```
+upstream fidelity_vip{
+   server fidelity.kdc.capitalone.com:11525 max_fails=0;
+   keepalive 2;
+}
+upstream google_vip{
+   server google.com:443 max_fails=0;
+   keepalive 2;
+}
+upstream yahoo_vip{
+   server yahoo.com:443 max_fails=0;
+   keepalive 2;
+}
+upstream facebook_vip{
+   server facebook.com:443 max_fails=0;
+   keepalive 2;
+}
 ```
