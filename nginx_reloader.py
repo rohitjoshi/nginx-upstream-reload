@@ -3,7 +3,7 @@
 ## 11/5/2016
 ## A script to monitor DNS change for Nginx upstream config and reload nginx
 ## https://github.com/rohitjoshi/reload-nginx
-## ./capione_reloader.py -d -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf
+## ./capione_reloader.py -d -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf --log_file=/tmp/nginx_reloader.log
 
 import time
 import dns.resolver #import the module
