@@ -1,5 +1,5 @@
 # reload-nginx
-Reload Nginx when upstream server IP changes
+Reload Nginx when upstream server IP changes.  Every minute, tt will reload upstream.conf file and resolve host and compare aginst the previous results. If DNS server returned different results (IP address), it will reload nginx
 
 ```
 Usage:
