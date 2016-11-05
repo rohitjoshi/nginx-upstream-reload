@@ -1,6 +1,11 @@
 #!/usr/bin/python
 import time
 import dns.resolver #import the module
+import subprocess
+
+nginx_proc="/opt/nginx/sbin/nginx"
+nginx_reload_arg = "-s reload"
+nginx_upstream_conf = "/opt/nginx/conf/upstream.conf"
 
 def validate_ip(s):
     a = s.split('.')
@@ -61,12 +66,16 @@ def compare_dict(old_dict, new_dict):
         return False
   return True
 
-old_dict = {} 
-print("#####Loading the nginx upstream file")
+old_dict = {}  
 while True:
-  servers = populate_hosts("/opt/nginx/conf/upstream.conf")
+  #print("#####Loading the nginx upstream file")
+  servers = populate_hosts(nginx_upstream_conf)
   new_dict=resolve_dns(servers)
+  #print("#####Comparing with previous dns results")
+  #print("old_dict:" + str(old_dict))
+  #print("new_dict:" + str(new_dict))
   if not compare_dict(old_dict, new_dict):
     print("reload nginx..")
+    subprocess.call(nginx_proc, nginx_reload_arg)
   old_dict = new_dict
-  time.sleep( 60 )
+  time.sleep( 5 )
