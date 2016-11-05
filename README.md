@@ -19,10 +19,7 @@ Usage:
 
 It is expecting upstream.conf file in the following format.
 ```
-upstream fidelity_vip{
-   server fidelity.kdc.capitalone.com:11525 max_fails=0;
-   keepalive 2;
-}
+
 upstream google_vip{
    server google.com:443 max_fails=0;
    keepalive 2;
