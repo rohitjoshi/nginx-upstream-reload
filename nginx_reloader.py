@@ -1,9 +1,8 @@
-#!/usr/bin/python
 ## Name: Rohit Joshi
 ## 11/5/2016
 ## A script to monitor DNS change for Nginx upstream config and reload nginx
 ## https://github.com/rohitjoshi/reload-nginx
-## ./capione_reloader.py -d -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf --log_file=/tmp/nginx_reloader.log
+## python nginx_reloader.py -d -n /opt/nginx/sbin/nginx -c /opt/nginx/conf/upstream.conf --log_file=/tmp/nginx_reloader.log
 
 import time
 import dns.resolver #import the module
@@ -13,17 +12,20 @@ import logging
 
 parser = argparse.ArgumentParser(
     description='A script to monitor DNS change for Nginx upstream config and reload nginx'
-) 
+)
 parser.add_argument(
     '-d', '--debug',
-    help="Print lots of debugging statements",
-    action="store_const", dest="loglevel", const=logging.DEBUG,
+    help='Print lots of debugging statements',
+    action='store_const', dest='loglevel', const=logging.DEBUG,
     default=logging.WARNING,
 )
 parser.add_argument('-s', '--stdout')
-parser.add_argument('-n', '--nginx_path',default="/opt/nginx/sbin/nginx")
-parser.add_argument('-c', '--upstream_conf',default="/opt/nginx/conf/upstream.conf")
-args = parser.parse_args() 
+parser.add_argument('-n', '--nginx_path', dest='nginx_path',default='/opt/nginx/sbin/nginx')
+parser.add_argument('-c', '--upstream_conf', dest='upstream_conf', default='/opt/nginx/conf/upstream.conf')
+parser.add_argument('-i', '--include', dest='include_list', default='', help='Comma separated list of servers to only include')
+parser.add_argument('-e', '--exclude', dest='exclude_list', default='', help='Comma separated list of servers to only exclude')
+parser.add_argument('-t', '--duration', dest='duration', default=60, help='DNS checking interval')
+args = parser.parse_args()
 logging.basicConfig(filename='nginx_reloader.log', format='%(asctime)s : %(levelname)s : %(message)s', datefmt='%m:%d:%Y %I:%M:%S %p', level=args.loglevel)
 
 # set up logging to console
@@ -39,6 +41,16 @@ if args.stdout:
 
 nginx_proc=[args.nginx_path, "-s", "reload"]
 nginx_upstream_conf = args.upstream_conf
+
+include_list = args.include_list.split(',')
+if include_list == ['']:
+  include_list = []
+
+exclude_list = args.exclude_list.split(',')
+if exclude_list == ['']:
+  exclude_list = []
+
+duration = int(args.duration)
 
 def validate_ip(s):
     a = s.split('.')
@@ -63,19 +75,23 @@ def populate_hosts(fname):
         if not validate_ip(s):
           servers.append(s)
   return servers
-        
+
 def resolve_dns(servers):
   servers_dict = {}
   myResolver = dns.resolver.Resolver() #create a new instance named 'myResolver'
   for server in servers:
+    if len(include_list) > 0 and server not in include_list:
+      continue
+    if len(exclude_list) > 0 and server in exclude_list:
+      continue
     try:
-      myAnswers = myResolver.query(server, "A") 
+      myAnswers = myResolver.query(server, "A")
       resolvered_ips = {}
       for rdata in myAnswers:
         logging.debug("resolving server :" + server + " with ip:" + str(rdata))
         resolvered_ips[str(rdata)] = 1
         logging.debug("add server :" + server + " values:" + str(resolvered_ips))
-        
+
       servers_dict[server] = resolvered_ips
     except Exception as e:
       logging.error("Query failed for server:" + server +  ", Error:" + str(e))
@@ -100,7 +116,7 @@ def compare_dict(old_dict, new_dict):
 
 
 def main():
-  old_dict = {}  
+  old_dict = {}
   logging.info("Starting the nginx reloader program...")
   while True:
     try:
@@ -117,7 +133,7 @@ def main():
       old_dict = new_dict
     except Exception as e:
       logging.error("Exception :" + str(e))
-    time.sleep( 5 )
-  
+    time.sleep( duration )
+
 if __name__ == '__main__':
   main()
