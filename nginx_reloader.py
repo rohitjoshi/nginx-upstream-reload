@@ -74,14 +74,15 @@ def populate_hosts(fname):
         s = s.split(":")[0]
         if not validate_ip(s):
           servers.append(s)
+  for server in include_list:
+    if server not in servers:
+      servers.append(server)
   return servers
 
 def resolve_dns(servers):
   servers_dict = {}
   myResolver = dns.resolver.Resolver() #create a new instance named 'myResolver'
   for server in servers:
-    if len(include_list) > 0 and server not in include_list:
-      continue
     if len(exclude_list) > 0 and server in exclude_list:
       continue
     try:
